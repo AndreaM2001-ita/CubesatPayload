@@ -1,0 +1,4 @@
+{"state": "Nominal", "reasons": "Change in Pressure", "fresh": null, "has": {"imu": true, "temp": true, "hum": true, "press": true, "light": true}, "values": {"confidence": 1.0, "presence": false, "temp": 24.65390625, "hum": 0.39835254904213646, "press": 101301, "imu": 0, "light": 7164385588}, "ts": 1566454995}
+
+
+{"ts": 1566454995, "Image": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII="}

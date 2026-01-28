@@ -1,0 +1,5 @@
+[0.000000] (-) TimerEvent: {}
+[0.001454] (-) JobUnselected: {'identifier': 'CompInfo'}
+[0.001740] (-) JobUnselected: {'identifier': 'MesonTemp'}
+[0.001845] (-) JobUnselected: {'identifier': 'MesonTemp'}
+[0.002501] (-) EventReactorShutdown: {}
