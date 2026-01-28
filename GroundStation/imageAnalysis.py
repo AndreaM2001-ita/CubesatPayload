@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-
-
-
 # Image analysis
 # Create mask for cloud cover and background sky using openCV HSV thresholding
 # Find fraction of cloud cover on captured image
@@ -10,10 +7,11 @@
 
 import pathlib      # For filesystem
 import cv2          # OpenCV for image reading and processing
-import yaml         # Library to access opencv config stored in YAML file 
+import yaml         # Library to access opencv config stored in YAML file
 import numpy as np  # Mathematical functions
 
 root = pathlib.Path.home() / "groundstation"
+
 
 def find_mask_cloud(img, filename):
 
@@ -25,13 +23,11 @@ def find_mask_cloud(img, filename):
         from yaml import safe_load
         cfg.update(safe_load(cfg_path.read_text()) or {})
 
-
     k = np.ones((3, 3), np.uint8)
 
     roi_top_frac = float(cfg.get("roi_top_frac", 0.0))
 
-
-    # Create ROI preview image 
+    # Create ROI preview image
     h, w = img.shape[:2]
     y0 = int(max(0.0, min(float(roi_top_frac), 0.9)) * h)
     overlay = img.copy()
@@ -39,11 +35,13 @@ def find_mask_cloud(img, filename):
     overlay[y0:, :] = (overlay[y0:, :] * 0.6 + 0.4 * 255).astype(img.dtype)
     cv2.line(overlay, (0, y0), (w, y0), (0, 255, 0), 2)
     txt = f"roi_top_frac={roi_top_frac:.2f} (kept below line)"
-    cv2.putText(overlay, txt, (10, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 3, cv2.LINE_AA)
-    cv2.putText(overlay, txt, (10, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 1, cv2.LINE_AA)
-    
-    
-    image_name = pathlib.Path(filename).stem  # Get image name without extension
+    cv2.putText(overlay, txt, (10, 28), cv2.FONT_HERSHEY_SIMPLEX,
+                0.7, (0, 0, 0), 3, cv2.LINE_AA)
+    cv2.putText(overlay, txt, (10, 28), cv2.FONT_HERSHEY_SIMPLEX,
+                0.7, (0, 255, 0), 1, cv2.LINE_AA)
+
+    # Get image name without extension
+    image_name = pathlib.Path(filename).stem
     folder_path = root / image_name
     folder_path.mkdir(parents=True, exist_ok=True)
     overlay_filename = folder_path / "roi_preview.jpg"
@@ -61,7 +59,8 @@ def find_mask_cloud(img, filename):
     hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
     # Detect sky and cloud mask based on HSV threshold value
-    sky_mask = cv2.inRange(hsv, (sky_h_min, sky_s_min, sky_v_min), (sky_h_max, 255, 255))
+    sky_mask = cv2.inRange(
+        hsv, (sky_h_min, sky_s_min, sky_v_min), (sky_h_max, 255, 255))
     cloud_mask = cv2.inRange(hsv, (0, 0, cloud_v_min), (179, cloud_s_max, 255))
 
     # Clean masks using morphological operations
@@ -82,22 +81,24 @@ def find_mask_cloud(img, filename):
     dbg[sky_mask > 0] = (255, 0, 0)  # sky → blue tint (BGR)
     dbg[cloud_mask > 0] = (0, 255, 255)  # clouds → yellow tint
 
-    cv2.putText(dbg, txt, (6, 22), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 3, cv2.LINE_AA)
-    cv2.putText(dbg, txt, (6, 22), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+    cv2.putText(dbg, txt, (6, 22), cv2.FONT_HERSHEY_SIMPLEX,
+                0.6, (0, 0, 0), 3, cv2.LINE_AA)
+    cv2.putText(dbg, txt, (6, 22), cv2.FONT_HERSHEY_SIMPLEX,
+                0.6, (255, 255, 255), 1, cv2.LINE_AA)
 
     # Save the image with overlays
     debug_filename = folder_path / "newoverlay.jpg"
     cv2.imwrite(str(debug_filename), dbg)
 
     # Contours for cloud mask
-    contours, _ = cv2.findContours(cloud_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(
+        cloud_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contour_image = np.zeros_like(roi)
-    cv2.drawContours(contour_image, contours, -1, (0, 255, 0), 3)  # Draw contours in green
+    cv2.drawContours(contour_image, contours, -1,
+                     (0, 255, 0), 3)  # Draw contours in green
 
     # Save the contours image
     contours_filename = folder_path / "cloud_contours.jpg"
     cv2.imwrite(str(contours_filename), contour_image)
 
     print(f"Cloud mask and contours saved in folder: {folder_path}")
-
-
