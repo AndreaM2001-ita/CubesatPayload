@@ -83,7 +83,3 @@ ros2 launch satellite_payload launch_payload.py
 ```bash
 python3 telemetry_reader.py
 ```
-
-## License
-
-MIT
